@@ -26,6 +26,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { path: "/my-listings", label: "My Listings", icon: Package, roles: ["citizen", "student"] },
     { path: "/dealer-dashboard", label: "Browse Listings", icon: Package, roles: ["scrap_dealer"] },
     { path: "/leaderboard", label: "Leaderboard", icon: Trophy, roles: ["citizen", "student", "ward_officer", "admin"] },
+    { path: "/city-overview", label: "City Overview", icon: BarChart3, roles: ["citizen", "student", "ward_officer"] },
     { path: "/rewards", label: "Rewards", icon: Gift, roles: ["citizen", "student"] },
     { path: "/families", label: "My Families", icon: Users, roles: ["student"] },
     { path: "/ward-reports", label: "Ward Reports", icon: ClipboardList, roles: ["ward_officer"] },
