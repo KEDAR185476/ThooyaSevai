@@ -15,6 +15,7 @@ type AppRole = Database["public"]["Enums"]["app_role"];
 const roleOptions: { value: AppRole; label: string; icon: React.ReactNode; desc: string }[] = [
   { value: "citizen", label: "Citizen", icon: <Users className="h-5 w-5" />, desc: "Report garbage, earn points" },
   { value: "student", label: "Student Ambassador", icon: <GraduationCap className="h-5 w-5" />, desc: "Track families, lead change" },
+  { value: "scrap_dealer", label: "Scrap Dealer", icon: <Leaf className="h-5 w-5" />, desc: "Buy waste, earn from recycling" },
   { value: "ward_officer", label: "Ward Officer", icon: <Shield className="h-5 w-5" />, desc: "Manage ward reports" },
   { value: "admin", label: "City Admin", icon: <Building2 className="h-5 w-5" />, desc: "City-wide dashboard" },
 ];

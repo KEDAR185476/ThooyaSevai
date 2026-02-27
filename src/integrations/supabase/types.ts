@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      dealer_offers: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          id: string
+          listing_id: string
+          message: string | null
+          price_offered: number
+          status: Database["public"]["Enums"]["offer_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          id?: string
+          listing_id: string
+          message?: string | null
+          price_offered: number
+          status?: Database["public"]["Enums"]["offer_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          listing_id?: string
+          message?: string | null
+          price_offered?: number
+          status?: Database["public"]["Enums"]["offer_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_offers_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "waste_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       families: {
         Row: {
           created_at: string
@@ -346,6 +387,62 @@ export type Database = {
         }
         Relationships: []
       }
+      waste_listings: {
+        Row: {
+          accepted_offer_id: string | null
+          address: string | null
+          category: Database["public"]["Enums"]["waste_category"]
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          latitude: number
+          longitude: number
+          quantity_kg: number
+          status: Database["public"]["Enums"]["listing_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accepted_offer_id?: string | null
+          address?: string | null
+          category: Database["public"]["Enums"]["waste_category"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          latitude: number
+          longitude: number
+          quantity_kg: number
+          status?: Database["public"]["Enums"]["listing_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accepted_offer_id?: string | null
+          address?: string | null
+          category?: Database["public"]["Enums"]["waste_category"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          latitude?: number
+          longitude?: number
+          quantity_kg?: number
+          status?: Database["public"]["Enums"]["listing_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waste_listings_accepted_offer_fkey"
+            columns: ["accepted_offer_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -360,9 +457,22 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "citizen" | "student" | "ward_officer" | "admin"
+      app_role:
+        | "citizen"
+        | "student"
+        | "ward_officer"
+        | "admin"
+        | "scrap_dealer"
       badge_level: "bronze" | "silver" | "gold" | "platinum"
+      listing_status:
+        | "open"
+        | "offered"
+        | "accepted"
+        | "collected"
+        | "cancelled"
+      offer_status: "pending" | "accepted" | "rejected" | "withdrawn"
       report_status: "pending" | "assigned" | "resolved"
+      waste_category: "plastic" | "paper" | "metal" | "ewaste" | "glass"
       waste_type: "plastic" | "organic" | "construction" | "mixed"
     }
     CompositeTypes: {
@@ -491,9 +601,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["citizen", "student", "ward_officer", "admin"],
+      app_role: ["citizen", "student", "ward_officer", "admin", "scrap_dealer"],
       badge_level: ["bronze", "silver", "gold", "platinum"],
+      listing_status: ["open", "offered", "accepted", "collected", "cancelled"],
+      offer_status: ["pending", "accepted", "rejected", "withdrawn"],
       report_status: ["pending", "assigned", "resolved"],
+      waste_category: ["plastic", "paper", "metal", "ewaste", "glass"],
       waste_type: ["plastic", "organic", "construction", "mixed"],
     },
   },
