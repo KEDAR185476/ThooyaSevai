@@ -13,6 +13,9 @@ import SellWaste from "./pages/SellWaste";
 import MyListings from "./pages/MyListings";
 import DealerDashboard from "./pages/DealerDashboard";
 import NotFound from "./pages/NotFound";
+import Heatmap from "./pages/Heatmap";
+import Leaderboard from "./pages/Leaderboard";
+import Analytics from "./pages/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -39,13 +42,13 @@ const App = () => (
             <Route path="/sell-waste" element={<ProtectedRoute><SellWaste /></ProtectedRoute>} />
             <Route path="/my-listings" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
             <Route path="/dealer-dashboard" element={<ProtectedRoute allowedRoles={["scrap_dealer"]}><DealerDashboard /></ProtectedRoute>} />
-            <Route path="/leaderboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
             <Route path="/rewards" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><Dashboard /></ProtectedRoute>} />
             <Route path="/ward-reports" element={<ProtectedRoute allowedRoles={["ward_officer"]}><Dashboard /></ProtectedRoute>} />
             <Route path="/complaints" element={<ProtectedRoute allowedRoles={["admin"]}><Dashboard /></ProtectedRoute>} />
-            <Route path="/heatmap" element={<ProtectedRoute allowedRoles={["admin"]}><Dashboard /></ProtectedRoute>} />
-            <Route path="/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><Dashboard /></ProtectedRoute>} />
+            <Route path="/heatmap" element={<ProtectedRoute allowedRoles={["admin"]}><Heatmap /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><Analytics /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
