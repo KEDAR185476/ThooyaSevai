@@ -16,6 +16,8 @@ import NotFound from "./pages/NotFound";
 import Heatmap from "./pages/Heatmap";
 import Leaderboard from "./pages/Leaderboard";
 import Analytics from "./pages/Analytics";
+import WardManagement from "./pages/WardManagement";
+import Complaints from "./pages/Complaints";
 
 const queryClient = new QueryClient();
 
@@ -46,7 +48,8 @@ const App = () => (
             <Route path="/rewards" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><Dashboard /></ProtectedRoute>} />
             <Route path="/ward-reports" element={<ProtectedRoute allowedRoles={["ward_officer"]}><Dashboard /></ProtectedRoute>} />
-            <Route path="/complaints" element={<ProtectedRoute allowedRoles={["admin"]}><Dashboard /></ProtectedRoute>} />
+            <Route path="/complaints" element={<ProtectedRoute allowedRoles={["admin"]}><Complaints /></ProtectedRoute>} />
+            <Route path="/ward-management" element={<ProtectedRoute allowedRoles={["admin"]}><WardManagement /></ProtectedRoute>} />
             <Route path="/heatmap" element={<ProtectedRoute allowedRoles={["admin"]}><Heatmap /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><Analytics /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
