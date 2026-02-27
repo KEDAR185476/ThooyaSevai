@@ -8,6 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import ReportGarbage from "./pages/ReportGarbage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,7 +32,7 @@ const App = () => (
               }
             />
             {/* Placeholder routes - will be built in next phases */}
-            <Route path="/report" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/report" element={<ProtectedRoute><ReportGarbage /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/rewards" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><Dashboard /></ProtectedRoute>} />
