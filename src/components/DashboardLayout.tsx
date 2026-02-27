@@ -30,6 +30,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { path: "/families", label: "My Families", icon: Users, roles: ["student"] },
     { path: "/ward-reports", label: "Ward Reports", icon: ClipboardList, roles: ["ward_officer"] },
     { path: "/complaints", label: "Complaints", icon: ClipboardList, roles: ["admin"] },
+    { path: "/ward-management", label: "Manage Wards", icon: Map, roles: ["admin"] },
     { path: "/heatmap", label: "Heatmap", icon: Map, roles: ["admin"] },
     { path: "/analytics", label: "Analytics", icon: BarChart3, roles: ["admin"] },
   ];
