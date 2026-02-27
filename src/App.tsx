@@ -20,6 +20,7 @@ import WardManagement from "./pages/WardManagement";
 import Complaints from "./pages/Complaints";
 import CityDashboard from "./pages/CityDashboard";
 import WasteAwareness from "./pages/WasteAwareness";
+import YouthMovement from "./pages/YouthMovement";
 
 const queryClient = new QueryClient();
 
@@ -50,7 +51,7 @@ const App = () => (
             <Route path="/waste-awareness" element={<ProtectedRoute><WasteAwareness /></ProtectedRoute>} />
             <Route path="/city-overview" element={<ProtectedRoute><CityDashboard /></ProtectedRoute>} />
             <Route path="/rewards" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><Dashboard /></ProtectedRoute>} />
+            <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><YouthMovement /></ProtectedRoute>} />
             <Route path="/ward-reports" element={<ProtectedRoute allowedRoles={["ward_officer"]}><Dashboard /></ProtectedRoute>} />
             <Route path="/complaints" element={<ProtectedRoute allowedRoles={["admin"]}><Complaints /></ProtectedRoute>} />
             <Route path="/ward-management" element={<ProtectedRoute allowedRoles={["admin"]}><WardManagement /></ProtectedRoute>} />

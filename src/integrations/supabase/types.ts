@@ -61,6 +61,7 @@ export type Database = {
           family_name: string
           id: string
           is_participating: boolean
+          street_name: string | null
           student_id: string
           updated_at: string
         }
@@ -69,6 +70,7 @@ export type Database = {
           family_name: string
           id?: string
           is_participating?: boolean
+          street_name?: string | null
           student_id: string
           updated_at?: string
         }
@@ -77,10 +79,55 @@ export type Database = {
           family_name?: string
           id?: string
           is_participating?: boolean
+          street_name?: string | null
           student_id?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      family_participation: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          family_id: string
+          id: string
+          points_earned: number
+          student_id: string
+          task_description: string
+          week_start: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          family_id: string
+          id?: string
+          points_earned?: number
+          student_id: string
+          task_description: string
+          week_start: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          family_id?: string
+          id?: string
+          points_earned?: number
+          student_id?: string
+          task_description?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_participation_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leaderboard: {
         Row: {

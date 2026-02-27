@@ -29,7 +29,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { path: "/city-overview", label: "City Overview", icon: BarChart3, roles: ["citizen", "student", "ward_officer"] },
     { path: "/waste-awareness", label: "AI Waste Awareness", icon: Sparkles, roles: ["citizen", "student", "ward_officer", "admin"] },
     { path: "/rewards", label: "Rewards", icon: Gift, roles: ["citizen", "student"] },
-    { path: "/families", label: "My Families", icon: Users, roles: ["student"] },
+    { path: "/families", label: "Youth Movement", icon: Sparkles, roles: ["student"] },
     { path: "/ward-reports", label: "Ward Reports", icon: ClipboardList, roles: ["ward_officer"] },
     { path: "/complaints", label: "Complaints", icon: ClipboardList, roles: ["admin"] },
     { path: "/ward-management", label: "Manage Wards", icon: Map, roles: ["admin"] },
