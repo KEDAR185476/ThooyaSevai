@@ -9,6 +9,9 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ReportGarbage from "./pages/ReportGarbage";
+import SellWaste from "./pages/SellWaste";
+import MyListings from "./pages/MyListings";
+import DealerDashboard from "./pages/DealerDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +36,9 @@ const App = () => (
             />
             {/* Placeholder routes - will be built in next phases */}
             <Route path="/report" element={<ProtectedRoute><ReportGarbage /></ProtectedRoute>} />
+            <Route path="/sell-waste" element={<ProtectedRoute><SellWaste /></ProtectedRoute>} />
+            <Route path="/my-listings" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
+            <Route path="/dealer-dashboard" element={<ProtectedRoute allowedRoles={["scrap_dealer"]}><DealerDashboard /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/rewards" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><Dashboard /></ProtectedRoute>} />

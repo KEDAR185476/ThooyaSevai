@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Recycle, Home, Camera, Trophy, Gift, Users, ClipboardList,
-  Map, BarChart3, LogOut, Menu, X, Shield, GraduationCap, Building2
+  Map, BarChart3, LogOut, Menu, X, Shield, GraduationCap, Building2, Package, IndianRupee
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -20,8 +20,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const navItems = [
-    { path: "/dashboard", label: "Dashboard", icon: Home, roles: ["citizen", "student", "ward_officer", "admin"] },
+    { path: "/dashboard", label: "Dashboard", icon: Home, roles: ["citizen", "student", "ward_officer", "admin", "scrap_dealer"] },
     { path: "/report", label: "Report Garbage", icon: Camera, roles: ["citizen", "student"] },
+    { path: "/sell-waste", label: "Sell Waste", icon: IndianRupee, roles: ["citizen", "student"] },
+    { path: "/my-listings", label: "My Listings", icon: Package, roles: ["citizen", "student"] },
+    { path: "/dealer-dashboard", label: "Browse Listings", icon: Package, roles: ["scrap_dealer"] },
     { path: "/leaderboard", label: "Leaderboard", icon: Trophy, roles: ["citizen", "student", "ward_officer", "admin"] },
     { path: "/rewards", label: "Rewards", icon: Gift, roles: ["citizen", "student"] },
     { path: "/families", label: "My Families", icon: Users, roles: ["student"] },
@@ -33,11 +36,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   const filteredNav = navItems.filter((item) => !role || item.roles.includes(role));
 
-  const roleIcon = {
+  const roleIcon: Record<string, React.ReactNode> = {
     citizen: <Users className="h-4 w-4" />,
     student: <GraduationCap className="h-4 w-4" />,
     ward_officer: <Shield className="h-4 w-4" />,
     admin: <Building2 className="h-4 w-4" />,
+    scrap_dealer: <Package className="h-4 w-4" />,
   };
 
   return (
