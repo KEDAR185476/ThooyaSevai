@@ -19,6 +19,7 @@ import Analytics from "./pages/Analytics";
 import WardManagement from "./pages/WardManagement";
 import Complaints from "./pages/Complaints";
 import CityDashboard from "./pages/CityDashboard";
+import WasteAwareness from "./pages/WasteAwareness";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/my-listings" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
             <Route path="/dealer-dashboard" element={<ProtectedRoute allowedRoles={["scrap_dealer"]}><DealerDashboard /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+            <Route path="/waste-awareness" element={<ProtectedRoute><WasteAwareness /></ProtectedRoute>} />
             <Route path="/city-overview" element={<ProtectedRoute><CityDashboard /></ProtectedRoute>} />
             <Route path="/rewards" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><Dashboard /></ProtectedRoute>} />

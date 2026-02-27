@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Recycle, Home, Camera, Trophy, Gift, Users, ClipboardList,
-  Map, BarChart3, LogOut, Menu, X, Shield, GraduationCap, Building2, Package, IndianRupee
+  Map, BarChart3, LogOut, Menu, X, Shield, GraduationCap, Building2, Package, IndianRupee, Sparkles
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { path: "/dealer-dashboard", label: "Browse Listings", icon: Package, roles: ["scrap_dealer"] },
     { path: "/leaderboard", label: "Leaderboard", icon: Trophy, roles: ["citizen", "student", "ward_officer", "admin"] },
     { path: "/city-overview", label: "City Overview", icon: BarChart3, roles: ["citizen", "student", "ward_officer"] },
+    { path: "/waste-awareness", label: "AI Waste Awareness", icon: Sparkles, roles: ["citizen", "student", "ward_officer", "admin"] },
     { path: "/rewards", label: "Rewards", icon: Gift, roles: ["citizen", "student"] },
     { path: "/families", label: "My Families", icon: Users, roles: ["student"] },
     { path: "/ward-reports", label: "Ward Reports", icon: ClipboardList, roles: ["ward_officer"] },
