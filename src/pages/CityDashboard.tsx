@@ -3,13 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { MapPin, AlertTriangle, CheckCircle, Clock, Trophy, TrendingUp, Star, Medal, Award } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MapPin, AlertTriangle, CheckCircle, Clock, Trophy, TrendingUp, Star, Medal, Award, Plus, BarChart3 } from "lucide-react";
 import WardExplainDialog from "@/components/WardExplainDialog";
 import StreetExplainDialog from "@/components/StreetExplainDialog";
 import StreetTimeline from "@/components/StreetTimeline";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 const severityConfig = {
   red: { label: "Heavy Garbage", bg: "bg-destructive/10", border: "border-destructive/30", text: "text-destructive", dot: "bg-destructive" },
@@ -24,7 +31,29 @@ const getRankIcon = (i: number) => {
   return <span className="text-sm text-muted-foreground font-medium">#{i + 1}</span>;
 };
 
+const CHART_COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--accent))",
+  "hsl(var(--destructive))",
+  "hsl(142, 76%, 36%)",
+  "hsl(262, 83%, 58%)",
+  "hsl(24, 95%, 53%)",
+];
+
 const CityDashboard = () => {
+  const { role } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const isAdmin = role === "admin";
+
+  // Admin form states
+  const [wardName, setWardName] = useState("");
+  const [wardNumber, setWardNumber] = useState("");
+  const [wardScore, setWardScore] = useState("100");
+  const [reportWardId, setReportWardId] = useState("");
+  const [reportStreet, setReportStreet] = useState("");
+  const [reportStatus, setReportStatus] = useState<"pending" | "assigned" | "resolved">("pending");
+
   const { data: wards } = useQuery({
     queryKey: ["city-wards"],
     queryFn: async () => {
@@ -50,6 +79,39 @@ const CityDashboard = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // Admin mutations
+  const addWardMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("wards").insert({
+        name: wardName,
+        ward_number: parseInt(wardNumber),
+        cleanliness_score: parseFloat(wardScore),
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["city-wards"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-wards"] });
+      toast({ title: "Ward added successfully" });
+      setWardName("");
+      setWardNumber("");
+      setWardScore("100");
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+
+  const updateScoreMutation = useMutation({
+    mutationFn: async ({ id, score }: { id: string; score: number }) => {
+      const { error } = await supabase.from("wards").update({ cleanliness_score: score }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["city-wards"] });
+      toast({ title: "Score updated" });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
 
   // Heatmap data
@@ -85,11 +147,28 @@ const CityDashboard = () => {
       .sort((a, b) => b.score - a.score);
   }, [reports]);
 
-  // Ward rankings sorted by score
+  // Ward rankings
   const wardRankings = useMemo(() => {
     if (!wards) return [];
     return [...wards].sort((a, b) => Number(b.cleanliness_score) - Number(a.cleanliness_score));
   }, [wards]);
+
+  // Chart data
+  const wardBarData = useMemo(() => {
+    return heatData.slice(0, 10).map((w) => ({
+      name: `W${w.ward_number}`,
+      Pending: w.pending,
+      Resolved: w.resolved,
+    }));
+  }, [heatData]);
+
+  const zonePieData = useMemo(() => [
+    { name: "Red Zones", value: counts.red },
+    { name: "Yellow Zones", value: counts.yellow },
+    { name: "Green Zones", value: counts.green },
+  ].filter(d => d.value > 0), [counts]);
+
+  const PIE_COLORS = ["hsl(0, 84%, 60%)", "hsl(45, 93%, 47%)", "hsl(142, 76%, 36%)"];
 
   return (
     <DashboardLayout>
@@ -98,6 +177,69 @@ const CityDashboard = () => {
           <h1 className="text-2xl md:text-3xl font-bold font-display">City Overview 🌆</h1>
           <p className="text-muted-foreground mt-1">See how clean Madurai is — live data, updated in real time</p>
         </div>
+
+        {/* Admin Data Entry Panel */}
+        {isAdmin && (
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Plus className="h-4 w-4" /> Admin: Add Data
+              </CardTitle>
+              <CardDescription>Add wards or update scores — data auto-visualizes below</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="add-ward" className="space-y-4">
+                <TabsList>
+                  <TabsTrigger value="add-ward">Add Ward</TabsTrigger>
+                  <TabsTrigger value="update-score">Update Score</TabsTrigger>
+                </TabsList>
+                <TabsContent value="add-ward">
+                  <div className="grid sm:grid-cols-4 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Ward Name</Label>
+                      <Input placeholder="e.g. Meenakshi Nagar" value={wardName} onChange={(e) => setWardName(e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Ward Number</Label>
+                      <Input type="number" placeholder="e.g. 12" value={wardNumber} onChange={(e) => setWardNumber(e.target.value)} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Cleanliness Score</Label>
+                      <Input type="number" placeholder="0-100" value={wardScore} onChange={(e) => setWardScore(e.target.value)} />
+                    </div>
+                    <div className="flex items-end">
+                      <Button onClick={() => addWardMutation.mutate()} disabled={!wardName || !wardNumber || addWardMutation.isPending} className="w-full">
+                        <Plus className="h-4 w-4 mr-1" /> Add Ward
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+                <TabsContent value="update-score">
+                  <div className="space-y-3">
+                    {wards?.map((ward) => (
+                      <div key={ward.id} className="flex items-center gap-3">
+                        <span className="text-sm font-medium min-w-[140px] truncate">Ward {ward.ward_number} — {ward.name}</span>
+                        <Input
+                          type="number"
+                          className="w-24"
+                          defaultValue={ward.cleanliness_score}
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val) && val !== ward.cleanliness_score) {
+                              updateScoreMutation.mutate({ id: ward.id, score: val });
+                            }
+                          }}
+                        />
+                        <span className="text-xs text-muted-foreground">/ 100</span>
+                      </div>
+                    ))}
+                    {(!wards || wards.length === 0) && <p className="text-sm text-muted-foreground">No wards yet. Add one first.</p>}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Monthly Awards */}
         <div className="grid sm:grid-cols-2 gap-4">
@@ -126,6 +268,58 @@ const CityDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Visualization Charts */}
+        {(heatData.length > 0 || zonePieData.length > 0) && (
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" /> Reports by Ward (Top 10)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={wardBarData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" fontSize={12} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis fontSize={12} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px" }}
+                        labelStyle={{ color: "hsl(var(--foreground))" }}
+                      />
+                      <Bar dataKey="Resolved" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Pending" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <MapPin className="h-4 w-4" /> Zone Distribution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={zonePieData} cx="50%" cy="50%" innerRadius={50} outerRadius={90} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                        {zonePieData.map((_, i) => (
+                          <Cell key={i} fill={PIE_COLORS[i]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <Tabs defaultValue="heatmap" className="space-y-4">
           <TabsList className="w-full grid grid-cols-3">
