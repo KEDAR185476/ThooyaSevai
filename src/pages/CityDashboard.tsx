@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { MapPin, AlertTriangle, CheckCircle, Clock, Trophy, TrendingUp, Star, Medal, Award } from "lucide-react";
 import WardExplainDialog from "@/components/WardExplainDialog";
+import StreetExplainDialog from "@/components/StreetExplainDialog";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemo } from "react";
@@ -178,7 +179,10 @@ const CityDashboard = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-sm font-medium truncate">{street.name}</p>
-                        <span className="text-sm font-bold text-primary">{street.score}%</span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-sm font-bold text-primary">{street.score}%</span>
+                          <StreetExplainDialog street={street} />
+                        </div>
                       </div>
                       <Progress value={street.score} className="h-2" />
                       <p className="text-[10px] text-muted-foreground mt-0.5">{street.resolved}/{street.total} resolved</p>
