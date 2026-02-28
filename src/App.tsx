@@ -23,6 +23,7 @@ import WasteAwareness from "./pages/WasteAwareness";
 import YouthMovement from "./pages/YouthMovement";
 import JoinStreet from "./pages/JoinStreet";
 import NeighborTasks from "./pages/NeighborTasks";
+import HotspotPredictions from "./pages/HotspotPredictions";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/ward-management" element={<ProtectedRoute allowedRoles={["admin"]}><WardManagement /></ProtectedRoute>} />
             <Route path="/heatmap" element={<ProtectedRoute allowedRoles={["admin"]}><Heatmap /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><Analytics /></ProtectedRoute>} />
+            <Route path="/hotspot-predictions" element={<ProtectedRoute allowedRoles={["admin"]}><HotspotPredictions /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

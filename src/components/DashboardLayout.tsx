@@ -37,6 +37,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { path: "/ward-management", label: "Manage Wards", icon: Map, roles: ["admin"] },
     { path: "/heatmap", label: "Heatmap", icon: Map, roles: ["admin"] },
     { path: "/analytics", label: "Analytics", icon: BarChart3, roles: ["admin"] },
+    { path: "/hotspot-predictions", label: "AI Predictions", icon: Sparkles, roles: ["admin"] },
   ];
 
   const filteredNav = navItems.filter((item) => !role || item.roles.includes(role));
