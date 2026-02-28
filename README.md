@@ -1,73 +1,336 @@
-# Welcome to your Lovable project
+ThooyaSevai – AI-Driven Urban Cleanliness & Environmental Governance Platform
+Overview
 
-## Project info
+ThooyaSevai is an AI-powered civic technology platform designed to transform urban cleanliness management into a transparent, data-driven, and community-powered governance system.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The platform integrates:
 
-## How can I edit this code?
+Real-time geo-tagged waste reporting
 
-There are several ways of editing your application.
+AI-based waste classification and disposal guidance
 
-**Use Lovable**
+Ward-level cleanliness ranking and analytics
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Youth-driven community participation (1 Student = 1 Street initiative)
 
-Changes made via Lovable will be committed automatically to this repo.
+Waste marketplace for recyclable materials
 
-**Use your preferred IDE**
+Smart bin integration
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Air quality monitoring with automated authority alerts
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+ThooyaSevai enables authorities, citizens, and youth to collaborate in improving urban sanitation, environmental health, and national cleanliness ranking performance.
 
-Follow these steps:
+Core Objectives
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Increase citizen participation in waste reporting and segregation.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Reduce grievance redressal time through SLA-based tracking.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Improve waste segregation compliance at source.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Enable data-driven ward-level sanitation planning.
 
-**Edit a file directly in GitHub**
+Integrate environmental monitoring with cleanliness governance.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Align directly with national cleanliness evaluation parameters.
 
-**Use GitHub Codespaces**
+System Architecture
+Frontend
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+React 18
 
-## What technologies are used for this project?
+TypeScript
 
-This project is built with:
+Vite
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Tailwind CSS
 
-## How can I deploy this project?
+shadcn/ui components
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+React Router v6 (role-based routing)
 
-## Can I connect a custom domain to my Lovable project?
+TanStack React Query (state management)
 
-Yes, you can!
+Recharts (analytics)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Backend
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Lovable Cloud (Authentication, PostgreSQL, Storage, Edge Functions)
+
+Row-Level Security (RLS) enabled on all tables
+
+JWT-based secure authentication
+
+AI Integration
+
+Gemini 2.5 Flash (multimodal waste classification)
+
+Gemini 3 Flash Preview (structured extraction & data parsing)
+
+Environmental Integration
+
+Smart Bin Monitoring
+
+Air Quality Monitoring Sensors
+
+Authority alert system for critical pollution levels
+
+Authentication & Role System
+
+Supported Roles:
+
+Citizen
+
+Student
+
+Ward Officer
+
+Admin
+
+Scrap Dealer
+
+Features:
+
+Email + password authentication
+
+Role-based access control
+
+Protected routes
+
+Persistent sessions
+
+Secure user_roles separation from profiles
+
+Major Features
+1. Garbage Reporting System
+
+Photo upload or camera capture
+
+Automatic GPS detection
+
+AI waste classification
+
+Confidence scoring
+
+Auto ward and street mapping
+
+Status flow: Pending → Assigned → Resolved
+
+48-hour SLA tracking with escalation
+
+2. AI Waste Analysis
+
+The AI engine returns:
+
+Waste type
+
+Confidence score
+
+Reuse suggestions
+
+Proper disposal method
+
+Environmental impact score
+
+Benefits of proper disposal
+
+Harms of improper disposal
+
+Includes rate-limit handling and structured JSON fallback.
+
+3. Gamification & Leaderboard
+
+Points for reporting, validation, resolution
+
+Badge tiers: Bronze, Silver, Gold, Platinum
+
+Weekly leaderboard:
+
+Individual
+
+Ward-wise
+
+Street-wise
+
+School-wise
+
+4. Youth Movement – 1 Student = 1 Street
+
+Street claiming system
+
+Invite-based neighbor participation
+
+Family participation tracking
+
+Weekly eco-task assignments
+
+Point multiplier for active neighborhoods
+
+Clean Ambassador badge progression
+
+5. Live Heatmap & Analytics Dashboard
+
+Admin Features:
+
+Real-time garbage density heatmap
+
+Ward cleanliness scoring
+
+Complaint management
+
+Resolution time tracking
+
+Monthly awards display
+
+Street-level performance trends
+
+6. Waste Marketplace
+
+Citizens:
+
+List recyclable waste with photo and GPS
+
+Categorize waste (Plastic, Paper, Metal, E-waste, Glass)
+
+Scrap Dealers:
+
+Browse listings
+
+Make offers
+
+Track transaction status
+
+Status Flow:
+Open → Offered → Accepted → Collected → Cancelled
+
+7. Smart Bin Integration
+
+Smart bins provide:
+
+Fill-level monitoring
+
+Location-based tracking
+
+Overflow alerts
+
+Real-time data syncing with dashboard
+
+This improves proactive waste collection efficiency.
+
+8. Air Quality Monitoring
+
+Integrated air quality sensors monitor:
+
+Pollution levels
+
+Environmental risk scores
+
+Area-based air quality trends
+
+If pollution exceeds safe thresholds:
+
+Automated alerts sent to authorities
+
+Risk severity classification
+
+Preventive action recommendations
+
+This ensures both visible cleanliness and environmental health are managed together.
+
+AI Edge Functions
+
+analyze-waste
+
+parse-city-data
+
+explain-street
+
+explain-ward
+
+predict-hotspots
+
+These functions enable intelligent automation, natural-language reasoning, structured extraction, and hotspot prediction.
+
+Database Schema
+
+Core Tables:
+
+profiles
+
+user_roles
+
+reports
+
+wards
+
+leaderboard
+
+rewards
+
+redemptions
+
+schools
+
+families
+
+family_participation
+
+street_assignments
+
+waste_listings
+
+dealer_offers
+
+All tables use Row-Level Security policies.
+
+Admin Capabilities
+
+City-wide complaint oversight
+
+Ward performance tracking
+
+AI-powered bulk data import
+
+Hotspot prediction (48-hour forward forecast)
+
+Cleanliness score explanation
+
+Public display dashboard for institutions
+
+Cleanliness Score Formula
+
+Cleanliness Score =
+(resolved_reports / total_reports) × 100 − overflow_penalty
+
+Scores are updated dynamically to reflect real-time ward performance.
+
+Expected Impact
+
+3X increase in citizen participation
+
+40–50% reduction in complaint resolution time
+
+50% reduction in garbage hotspot zones
+
+Improved waste segregation compliance
+
+Increased transparency in sanitation governance
+
+Alignment with national cleanliness ranking parameters
+
+Environmental monitoring integration for healthier urban living
+
+Security
+
+JWT-based authentication
+
+Row-Level Security on all tables
+
+Role-based route protection
+
+Controlled update access for officers and admins
+
+Vision
+
+ThooyaSevai transforms urban sanitation from a complaint-driven process into a performance-driven governance ecosystem. By integrating AI, community participation, environmental monitoring, and digital transparency, the platform enables cities to transition toward sustainable, accountable, and data-backed cleanliness management.
