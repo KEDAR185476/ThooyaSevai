@@ -61,6 +61,7 @@ export type Database = {
           family_name: string
           id: string
           is_participating: boolean
+          neighbor_user_id: string | null
           street_name: string | null
           student_id: string
           updated_at: string
@@ -70,6 +71,7 @@ export type Database = {
           family_name: string
           id?: string
           is_participating?: boolean
+          neighbor_user_id?: string | null
           street_name?: string | null
           student_id: string
           updated_at?: string
@@ -79,6 +81,7 @@ export type Database = {
           family_name?: string
           id?: string
           is_participating?: boolean
+          neighbor_user_id?: string | null
           street_name?: string | null
           student_id?: string
           updated_at?: string
@@ -382,6 +385,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      street_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+          street_name: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          street_name: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          street_name?: string
+          student_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
