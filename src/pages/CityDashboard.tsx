@@ -59,7 +59,6 @@ const CityDashboard = () => {
   const [bulkText, setBulkText] = useState("");
   const [parsedData, setParsedData] = useState<any>(null);
   const [isParsing, setIsParsing] = useState(false);
-  const [isConfirming, setIsConfirming] = useState(false);
   const [importResults, setImportResults] = useState<any>(null);
 
   const { data: wards } = useQuery({
@@ -122,47 +121,39 @@ const CityDashboard = () => {
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
 
-  // AI Bulk parse
-  const handleParse = async () => {
+  // AI Auto Import — single click: parse + create everything
+  const handleAutoImport = async () => {
     if (!bulkText.trim()) return;
     setIsParsing(true);
     setParsedData(null);
     setImportResults(null);
     try {
-      const { data, error } = await supabase.functions.invoke("parse-city-data", {
+      // Step 1: Parse to show preview
+      const { data: previewData, error: previewError } = await supabase.functions.invoke("parse-city-data", {
         body: { rawText: bulkText, action: "preview" },
       });
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
-      setParsedData(data.parsed);
-      toast({ title: "Data parsed!", description: `Found ${data.parsed.wards?.length ?? 0} wards, ${data.parsed.reports?.length ?? 0} reports` });
-    } catch (e: any) {
-      toast({ title: "Parse failed", description: e.message, variant: "destructive" });
-    } finally {
-      setIsParsing(false);
-    }
-  };
+      if (previewError) throw previewError;
+      if (previewData.error) throw new Error(previewData.error);
+      setParsedData(previewData.parsed);
 
-  const handleConfirmImport = async () => {
-    if (!bulkText.trim()) return;
-    setIsConfirming(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("parse-city-data", {
+      // Step 2: Immediately confirm & import
+      const { data: confirmData, error: confirmError } = await supabase.functions.invoke("parse-city-data", {
         body: { rawText: bulkText, action: "confirm" },
       });
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
-      setImportResults(data.results);
+      if (confirmError) throw confirmError;
+      if (confirmData.error) throw new Error(confirmData.error);
+      setImportResults(confirmData.results);
       queryClient.invalidateQueries({ queryKey: ["city-wards"] });
       queryClient.invalidateQueries({ queryKey: ["city-reports"] });
       queryClient.invalidateQueries({ queryKey: ["admin-wards"] });
-      toast({ title: "Import complete!", description: `${data.results.wardsAdded} wards, ${data.results.reportsAdded} reports added` });
-      setBulkText("");
-      setParsedData(null);
+      toast({
+        title: "✅ Auto-imported!",
+        description: `${confirmData.results.wardsAdded} wards + ${confirmData.results.reportsAdded} reports created from your data`,
+      });
     } catch (e: any) {
       toast({ title: "Import failed", description: e.message, variant: "destructive" });
     } finally {
-      setIsConfirming(false);
+      setIsParsing(false);
     }
   };
 
@@ -291,40 +282,35 @@ const CityDashboard = () => {
                 </TabsContent>
                 <TabsContent value="ai-bulk" className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs">Paste raw data (spreadsheet, notes, any format)</Label>
+                    <Label className="text-xs">Paste raw data (spreadsheet, notes, any format) — AI will auto-create wards, reports & insights</Label>
                     <Textarea
-                      placeholder={`Paste any city data here. Examples:\n\nWard 1 - Meenakshi Nagar, Score: 85, 12 total reports, 10 resolved\nWard 2 - Thiruparankundram, Score: 60, 20 reports, 8 resolved\nKK Nagar Main Road - 5 pending complaints, plastic waste\nAnna Nagar 2nd Street - resolved, construction debris\n\nOr paste from Excel/Google Sheets...`}
+                      placeholder={`Just paste your data here and click "Auto Import". Examples:\n\nWard 1 - Meenakshi Nagar, Score: 85, 12 total reports, 10 resolved\nWard 2 - Thiruparankundram, Score: 60, 20 reports, 8 resolved\nKK Nagar Main Road - 5 pending complaints, plastic waste\nAnna Nagar 2nd Street - resolved, construction debris\n\nOr paste from Excel/Google Sheets — any format works!`}
                       value={bulkText}
                       onChange={(e) => setBulkText(e.target.value)}
-                      rows={8}
+                      rows={10}
                       className="font-mono text-xs"
                     />
-                    <div className="flex items-center gap-2">
-                      <Button onClick={handleParse} disabled={!bulkText.trim() || isParsing} variant="secondary">
-                        {isParsing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
-                        {isParsing ? "AI Parsing..." : "Parse with AI"}
+                    <div className="flex items-center gap-3">
+                      <Button onClick={handleAutoImport} disabled={!bulkText.trim() || isParsing} className="gap-2">
+                        {isParsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                        {isParsing ? "AI is creating wards & reports..." : "⚡ Auto Import"}
                       </Button>
-                      <p className="text-[10px] text-muted-foreground">AI will auto-detect wards, reports, streets & insights</p>
+                      {bulkText.trim() && !isParsing && (
+                        <p className="text-[10px] text-muted-foreground">One click — AI parses, creates wards, reports & shows insights</p>
+                      )}
                     </div>
                   </div>
 
-                  {/* Parsed Preview */}
+                  {/* Auto-generated Results */}
                   {parsedData && (
                     <div className="space-y-3 border rounded-lg p-4 bg-background">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-sm flex items-center gap-1.5">
-                          <CheckCircle className="h-4 w-4 text-primary" /> Parsed Results Preview
-                        </h4>
-                        <Button onClick={handleConfirmImport} disabled={isConfirming} size="sm">
-                          {isConfirming ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Upload className="h-3.5 w-3.5 mr-1" />}
-                          {isConfirming ? "Importing..." : "Confirm & Import"}
-                        </Button>
-                      </div>
+                      <h4 className="font-semibold text-sm flex items-center gap-1.5">
+                        <CheckCircle className="h-4 w-4 text-primary" /> Auto-Created Records
+                      </h4>
 
-                      {/* Wards */}
                       {parsedData.wards?.length > 0 && (
                         <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-1">🏘️ Wards ({parsedData.wards.length})</p>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">🏘️ Wards Created ({parsedData.wards.length})</p>
                           <div className="grid sm:grid-cols-2 gap-2">
                             {parsedData.wards.map((w: any, i: number) => (
                               <div key={i} className="text-xs p-2 rounded bg-primary/5 border border-primary/10">
@@ -337,10 +323,9 @@ const CityDashboard = () => {
                         </div>
                       )}
 
-                      {/* Reports */}
                       {parsedData.reports?.length > 0 && (
                         <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-1">📋 Reports ({parsedData.reports.length})</p>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">📋 Reports Created ({parsedData.reports.length})</p>
                           <div className="grid sm:grid-cols-2 gap-2">
                             {parsedData.reports.map((r: any, i: number) => (
                               <div key={i} className="text-xs p-2 rounded bg-accent/5 border border-accent/10">
@@ -354,7 +339,6 @@ const CityDashboard = () => {
                         </div>
                       )}
 
-                      {/* Insights */}
                       {parsedData.insights?.length > 0 && (
                         <div>
                           <p className="text-xs font-medium text-muted-foreground mb-1">💡 AI Insights ({parsedData.insights.length})</p>
