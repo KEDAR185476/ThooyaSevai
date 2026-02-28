@@ -21,6 +21,8 @@ import Complaints from "./pages/Complaints";
 import CityDashboard from "./pages/CityDashboard";
 import WasteAwareness from "./pages/WasteAwareness";
 import YouthMovement from "./pages/YouthMovement";
+import JoinStreet from "./pages/JoinStreet";
+import NeighborTasks from "./pages/NeighborTasks";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +54,8 @@ const App = () => (
             <Route path="/city-overview" element={<ProtectedRoute><CityDashboard /></ProtectedRoute>} />
             <Route path="/rewards" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/families" element={<ProtectedRoute allowedRoles={["student"]}><YouthMovement /></ProtectedRoute>} />
+            <Route path="/join-street" element={<ProtectedRoute><JoinStreet /></ProtectedRoute>} />
+            <Route path="/my-street-tasks" element={<ProtectedRoute><NeighborTasks /></ProtectedRoute>} />
             <Route path="/ward-reports" element={<ProtectedRoute allowedRoles={["ward_officer"]}><Dashboard /></ProtectedRoute>} />
             <Route path="/complaints" element={<ProtectedRoute allowedRoles={["admin"]}><Complaints /></ProtectedRoute>} />
             <Route path="/ward-management" element={<ProtectedRoute allowedRoles={["admin"]}><WardManagement /></ProtectedRoute>} />

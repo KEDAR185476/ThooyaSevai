@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Recycle, Home, Camera, Trophy, Gift, Users, ClipboardList,
-  Map, BarChart3, LogOut, Menu, X, Shield, GraduationCap, Building2, Package, IndianRupee, Sparkles
+  Map, MapPin, BarChart3, LogOut, Menu, X, Shield, GraduationCap, Building2, Package, IndianRupee, Sparkles
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { path: "/waste-awareness", label: "AI Waste Awareness", icon: Sparkles, roles: ["citizen", "student", "ward_officer", "admin"] },
     { path: "/rewards", label: "Rewards", icon: Gift, roles: ["citizen", "student"] },
     { path: "/families", label: "Youth Movement", icon: Sparkles, roles: ["student"] },
+    { path: "/my-street-tasks", label: "My Street Tasks", icon: MapPin, roles: ["citizen"] },
+    { path: "/join-street", label: "Join a Street", icon: Users, roles: ["citizen"] },
     { path: "/ward-reports", label: "Ward Reports", icon: ClipboardList, roles: ["ward_officer"] },
     { path: "/complaints", label: "Complaints", icon: ClipboardList, roles: ["admin"] },
     { path: "/ward-management", label: "Manage Wards", icon: Map, roles: ["admin"] },
