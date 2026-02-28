@@ -47,6 +47,8 @@ const WardManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-wards"] });
+      queryClient.invalidateQueries({ queryKey: ["city-wards"] });
+      queryClient.invalidateQueries({ queryKey: ["city-reports"] });
       toast({ title: editingWard ? "Ward updated" : "Ward added" });
       resetForm();
     },
@@ -60,6 +62,8 @@ const WardManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-wards"] });
+      queryClient.invalidateQueries({ queryKey: ["city-wards"] });
+      queryClient.invalidateQueries({ queryKey: ["city-reports"] });
       toast({ title: "Ward deleted" });
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
