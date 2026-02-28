@@ -6,8 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, AlertTriangle, CheckCircle, Clock, Trophy, TrendingUp, Star, Medal, Award, Plus, BarChart3 } from "lucide-react";
+import { MapPin, AlertTriangle, CheckCircle, Clock, Trophy, TrendingUp, Star, Medal, Award, Plus, BarChart3, Sparkles, Upload, Loader2, Info } from "lucide-react";
 import WardExplainDialog from "@/components/WardExplainDialog";
 import StreetExplainDialog from "@/components/StreetExplainDialog";
 import StreetTimeline from "@/components/StreetTimeline";
@@ -53,6 +54,13 @@ const CityDashboard = () => {
   const [reportWardId, setReportWardId] = useState("");
   const [reportStreet, setReportStreet] = useState("");
   const [reportStatus, setReportStatus] = useState<"pending" | "assigned" | "resolved">("pending");
+
+  // AI Bulk import states
+  const [bulkText, setBulkText] = useState("");
+  const [parsedData, setParsedData] = useState<any>(null);
+  const [isParsing, setIsParsing] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [importResults, setImportResults] = useState<any>(null);
 
   const { data: wards } = useQuery({
     queryKey: ["city-wards"],
@@ -113,6 +121,50 @@ const CityDashboard = () => {
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
+
+  // AI Bulk parse
+  const handleParse = async () => {
+    if (!bulkText.trim()) return;
+    setIsParsing(true);
+    setParsedData(null);
+    setImportResults(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("parse-city-data", {
+        body: { rawText: bulkText, action: "preview" },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      setParsedData(data.parsed);
+      toast({ title: "Data parsed!", description: `Found ${data.parsed.wards?.length ?? 0} wards, ${data.parsed.reports?.length ?? 0} reports` });
+    } catch (e: any) {
+      toast({ title: "Parse failed", description: e.message, variant: "destructive" });
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
+  const handleConfirmImport = async () => {
+    if (!bulkText.trim()) return;
+    setIsConfirming(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("parse-city-data", {
+        body: { rawText: bulkText, action: "confirm" },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      setImportResults(data.results);
+      queryClient.invalidateQueries({ queryKey: ["city-wards"] });
+      queryClient.invalidateQueries({ queryKey: ["city-reports"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-wards"] });
+      toast({ title: "Import complete!", description: `${data.results.wardsAdded} wards, ${data.results.reportsAdded} reports added` });
+      setBulkText("");
+      setParsedData(null);
+    } catch (e: any) {
+      toast({ title: "Import failed", description: e.message, variant: "destructive" });
+    } finally {
+      setIsConfirming(false);
+    }
+  };
 
   // Heatmap data
   const heatData = useMemo(() => {
@@ -189,9 +241,10 @@ const CityDashboard = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="add-ward" className="space-y-4">
-                <TabsList>
+                <TabsList className="w-full grid grid-cols-3">
                   <TabsTrigger value="add-ward">Add Ward</TabsTrigger>
                   <TabsTrigger value="update-score">Update Score</TabsTrigger>
+                  <TabsTrigger value="ai-bulk" className="gap-1"><Sparkles className="h-3.5 w-3.5" /> AI Bulk Import</TabsTrigger>
                 </TabsList>
                 <TabsContent value="add-ward">
                   <div className="grid sm:grid-cols-4 gap-3">
@@ -235,6 +288,110 @@ const CityDashboard = () => {
                     ))}
                     {(!wards || wards.length === 0) && <p className="text-sm text-muted-foreground">No wards yet. Add one first.</p>}
                   </div>
+                </TabsContent>
+                <TabsContent value="ai-bulk" className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Paste raw data (spreadsheet, notes, any format)</Label>
+                    <Textarea
+                      placeholder={`Paste any city data here. Examples:\n\nWard 1 - Meenakshi Nagar, Score: 85, 12 total reports, 10 resolved\nWard 2 - Thiruparankundram, Score: 60, 20 reports, 8 resolved\nKK Nagar Main Road - 5 pending complaints, plastic waste\nAnna Nagar 2nd Street - resolved, construction debris\n\nOr paste from Excel/Google Sheets...`}
+                      value={bulkText}
+                      onChange={(e) => setBulkText(e.target.value)}
+                      rows={8}
+                      className="font-mono text-xs"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button onClick={handleParse} disabled={!bulkText.trim() || isParsing} variant="secondary">
+                        {isParsing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
+                        {isParsing ? "AI Parsing..." : "Parse with AI"}
+                      </Button>
+                      <p className="text-[10px] text-muted-foreground">AI will auto-detect wards, reports, streets & insights</p>
+                    </div>
+                  </div>
+
+                  {/* Parsed Preview */}
+                  {parsedData && (
+                    <div className="space-y-3 border rounded-lg p-4 bg-background">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-sm flex items-center gap-1.5">
+                          <CheckCircle className="h-4 w-4 text-primary" /> Parsed Results Preview
+                        </h4>
+                        <Button onClick={handleConfirmImport} disabled={isConfirming} size="sm">
+                          {isConfirming ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Upload className="h-3.5 w-3.5 mr-1" />}
+                          {isConfirming ? "Importing..." : "Confirm & Import"}
+                        </Button>
+                      </div>
+
+                      {/* Wards */}
+                      {parsedData.wards?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">🏘️ Wards ({parsedData.wards.length})</p>
+                          <div className="grid sm:grid-cols-2 gap-2">
+                            {parsedData.wards.map((w: any, i: number) => (
+                              <div key={i} className="text-xs p-2 rounded bg-primary/5 border border-primary/10">
+                                <span className="font-medium">Ward {w.ward_number}</span> — {w.name}
+                                {w.cleanliness_score != null && <span className="ml-1 text-primary">(Score: {w.cleanliness_score})</span>}
+                                {w.total_reports != null && <span className="ml-1 text-muted-foreground">{w.resolved_reports ?? 0}/{w.total_reports} resolved</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Reports */}
+                      {parsedData.reports?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">📋 Reports ({parsedData.reports.length})</p>
+                          <div className="grid sm:grid-cols-2 gap-2">
+                            {parsedData.reports.map((r: any, i: number) => (
+                              <div key={i} className="text-xs p-2 rounded bg-accent/5 border border-accent/10">
+                                <span className="font-medium">{r.street_name}</span>
+                                <Badge variant="outline" className="ml-1 text-[10px] px-1 py-0">{r.status}</Badge>
+                                {r.waste_type && <Badge variant="secondary" className="ml-1 text-[10px] px-1 py-0">{r.waste_type}</Badge>}
+                                <span className="text-muted-foreground ml-1">→ Ward {r.ward_number}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Insights */}
+                      {parsedData.insights?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">💡 AI Insights ({parsedData.insights.length})</p>
+                          <div className="space-y-1.5">
+                            {parsedData.insights.map((ins: any, i: number) => (
+                              <div key={i} className={`text-xs p-2 rounded flex items-start gap-2 ${
+                                ins.severity === "critical" ? "bg-destructive/10 border border-destructive/20" :
+                                ins.severity === "warning" ? "bg-accent/10 border border-accent/20" :
+                                "bg-secondary/50 border border-border"
+                              }`}>
+                                {ins.severity === "critical" ? <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" /> :
+                                 ins.severity === "warning" ? <AlertTriangle className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" /> :
+                                 <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />}
+                                <div>
+                                  <p className="font-medium">{ins.title}</p>
+                                  <p className="text-muted-foreground">{ins.description}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Import Results */}
+                  {importResults && (
+                    <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm">
+                      <p className="font-semibold text-primary">✅ Import Complete</p>
+                      <p className="text-xs mt-1">{importResults.wardsAdded} wards added • {importResults.reportsAdded} reports added</p>
+                      {importResults.errors?.length > 0 && (
+                        <div className="mt-2 text-xs text-destructive">
+                          {importResults.errors.map((e: string, i: number) => <p key={i}>⚠ {e}</p>)}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </CardContent>
