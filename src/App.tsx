@@ -18,6 +18,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Analytics from "./pages/Analytics";
 import WardManagement from "./pages/WardManagement";
 import Complaints from "./pages/Complaints";
+import Rewards from "./pages/Rewards";
 import CityDashboard from "./pages/CityDashboard";
 import WasteAwareness from "./pages/WasteAwareness";
 import YouthMovement from "./pages/YouthMovement";
